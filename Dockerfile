@@ -15,5 +15,6 @@ RUN pip install --user -r requirements.txt
 ENV PATH="/home/appuser/.local/bin:${PATH}"
 
 COPY --chown=appuser:appuser . .
+ENV FLASK_APP=src/app.py
 
 CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0","--port=8080"]
