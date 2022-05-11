@@ -1,0 +1,4 @@
+{
+    "apiUrl": "https://api.data.gov.sg/v1/environment/rainfall",
+    "location":["Marina Gardens Drive"]
+}
