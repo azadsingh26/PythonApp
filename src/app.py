@@ -20,7 +20,8 @@ def get_rainfall_data():
     '''Main Entry Point For Get API Call  for Rain'''
 
     configurations=read_configs()
-    print(configurations)
+    app.logger.info("Values from Configuration File")
+    app.logger.info(configurations)
     try:
         api_url=configurations["apiUrl"]
         locations=configurations["location"]
@@ -31,10 +32,12 @@ def get_rainfall_data():
         for location in locations:
             response_from_findlocation=findLocationData(location,api_data)
             output=output+ "" + response_from_findlocation
+        app.logger.info("Successfully Retrieved Data")
         return output
+        
     except:
         app.logger.error('Malformed Data. Please Check')
-        print("Oops!", sys.exc_info()[0], "occurred.")
+        app.logger.error("Oops!", sys.exc_info()[0], "occurred.")
         return 'Malformed Data. Please Check'
 
 
@@ -44,23 +47,27 @@ def read_configs():
         
         with open(config_location+config_file_name,'r') as f:
             data = json.load(f)
+        app.logger.info("Successfully read configurations from Config File")
         return data
     except:
         app.logger.error("File " +config_location+config_file_name + 'Not Present in Right Directory. Please check')
-        print("File " +config_location+config_file_name + 'Not Present in Right Directory. Please check')
-        print("Oops!", sys.exc_info()[0], "occurred.")
+        #print("File " +config_location+config_file_name + 'Not Present in Right Directory. Please check')
+        app.logger.error("Oops!", sys.exc_info()[0], "occurred.")
 
 
 def getDataFromApiURL(api_url):
 
     ''' This function pulls the data from configured apiUrl and returns the response in json format. This also checks for api response'''
     r = requests.get(api_url)
-    print(r.json())
+    app.logger.info(r.json())
+
     
     if (r.status_code!= 200):
         app.logger.error(api_url+ ": is down or incorrect. Please check")
         print(api_url+ ": is down or incorrect. Please check")
-    else:    
+    else:
+        app.logger.info("Successfull Response from Api Call "+api_url )
+        app.logger.info(r.json())
         return r.json()
 
 def findLocationData(location,api_data):
@@ -70,7 +77,9 @@ def findLocationData(location,api_data):
         if station["name"]==location:
             station_id=station["id"]
             response=raindataInformation(api_data,station_id)
+            app.logger.info(location+","+response)
             return location+","+response
+    app.logger.warning("Not a Valid Location:" + location)
     return "Not a Valid Location:" + location
 
 
@@ -80,11 +89,7 @@ def raindataInformation(api_data,id):
         now = datetime.now()
 
         current_time = now.strftime("%H:%M")
-        print("Current Time =", current_time)
-        
-
-
-
+       
         for items in readings["readings"]:
             if id==items["station_id"]:
                 rainfall=str(items["value"])            
